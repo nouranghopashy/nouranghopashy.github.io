@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bunny Coffee Machine Store</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div id="loginSection" class="max-w-md mx-auto bg-white p-8 rounded shadow">
+        <h1 class="text-2xl font-bold mb-4">Login</h1>
+        <input id="username" type="text" placeholder="Username" class="w-full p-2 mb-2 border rounded">
+        <input id="password" type="password" placeholder="Password" class="w-full p-2 mb-4 border rounded">
+        <button onclick="login()" class="w-full bg-blue-500 text-white p-2 rounded">Login</button>
+        <p id="loginMessage" class="mt-2 text-red-500"></p>
+    </div>
+
+    <div id="mainSection" class="hidden max-w-4xl mx-auto bg-white p-8 rounded shadow mt-8">
+        <h1 class="text-3xl font-bold mb-4">Bunny Coffee Machine Store</h1>
+        <div class="grid grid-cols-2 gap-4">
+            <button onclick="showAllMachines()" class="bg-blue-500 text-white p-2 rounded">Show all machines</button>
+            <button onclick="searchById()" class="bg-green-500 text-white p-2 rounded">Search by ID</button>
+            <button onclick="addMachine()" class="bg-yellow-500 text-white p-2 rounded">Add new machine</button>
+            <button onclick="updateById()" class="bg-purple-500 text-white p-2 rounded">Update by ID</button>
+            <button onclick="deleteById()" class="bg-red-500 text-white p-2 rounded">Delete by ID</button>
+            <button onclick="restoreDeletedItems()" class="bg-indigo-500 text-white p-2 rounded">Restore deleted items</button>
+        </div>
+        <div id="outputArea" class="mt-8"></div>
+    </div>
+
+    <script>
+        let machines = [
+            {id: 1, name: "Espresso", price: 5000, madeIn: "Italy", year: 2021, color: "White"},
+            {id: 2, name: "French Press", price: 2000, madeIn: "France", year: 2020, color: "Pink"},
+            {id: 3, name: "Drip Coffee", price: 3000, madeIn: "USA", year: 2019, color: "Black"},
+            {id: 4, name: "Capsule", price: 7000, madeIn: "Egypt", year: 2022, color: "Blue"},
+            {id: 5, name: "Turkish Maker", price: 1500, madeIn: "Turkey", year: 2018, color: "Grey"}
+        ];
+
+        let deletedMachines = [
+            {id: 6, name: "Philips", price: 3000, madeIn: "China", year: 2020, color: "Silver"},
+            {id: 7, name: "Breville", price: 6000, madeIn: "Japan", year: 2024, color: "Bronze"}
+        ];
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username === 'BCMS' && password === '12345') {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('mainSection').classList.remove('hidden');
+            } else {
+                document.getElementById('loginMessage').textContent = 'Invalid username or password';
+            }
+        }
+
+        function showAllMachines() {
+            let output = '<h2 class="text-xl font-bold mb-2">Coffee Machines List</h2>';
+            output += '<table class="w-full"><tr><th>ID</th><th>Name</th><th>Price</th><th>Made in</th><th>Year</th><th>Color</th></tr>';
+            machines.forEach(machine => {
+                output += `<tr><td>${machine.id}</td><td>${machine.name}</td><td>${machine.price}</td><td>${machine.madeIn}</td><td>${machine.year}</td><td>${machine.color}</td></tr>`;
+            });
+            output += '</table>';
+            document.getElementById('outputArea').innerHTML = output;
+        }
+
+        function searchById() {
+            const id = prompt('Enter Machine ID to search:');
+            const machine = machines.find(m => m.id === parseInt(id));
+            if (machine) {
+                let output = '<h2 class="text-xl font-bold mb-2">Search Result</h2>';
+                output += '<table class="w-full"><tr><th>ID</th><th>Name</th><th>Price</th><th>Made in</th><th>Year</th><th>Color</th></tr>';
+                output += `<tr><td>${machine.id}</td><td>${machine.name}</td><td>${machine.price}</td><td>${machine.madeIn}</td><td>${machine.year}</td><td>${machine.color}</td></tr>`;
+                output += '</table>';
+                document.getElementById('outputArea').innerHTML = output;
+            } else {
+                document.getElementById('outputArea').innerHTML = '<p class="text-red-500">Machine not found</p>';
+            }
+        }
+
+        function addMachine() {
+            const name = prompt('Enter machine name:');
+            const price = parseFloat(prompt('Enter machine price:'));
+            const madeIn = prompt('Enter country made in:');
+            const year = parseInt(prompt('Enter year of manufacture:'));
+            const color = prompt('Enter machine color:');
+            const newId = Math.max(...machines.map(m => m.id)) + 1;
+            machines.push({id: newId, name, price, madeIn, year, color});
+            document.getElementById('outputArea').innerHTML = '<p class="text-green-500">New machine added successfully!</p>';
+        }
+
+        function updateById() {
+            const id = parseInt(prompt('Enter the ID to update:'));
+            const machineIndex = machines.findIndex(m => m.id === id);
+            if (machineIndex !== -1) {
+                const machine = machines[machineIndex];
+                const name = prompt(`Enter the new machine name (or press Enter to keep ${machine.name}):`) || machine.name;
+                const price = parseFloat(prompt(`Enter the new price (or press Enter to keep ${machine.price}):`) || machine.price);
+                const madeIn = prompt(`Enter the new madein country (or press Enter to keep ${machine.madeIn}):`) || machine.madeIn;
+                const year = parseInt(prompt(`Enter the new year (or press Enter to keep ${machine.year}):`) || machine.year);
+                const color = prompt(`Enter the new machine colour (or press Enter to keep ${machine.color}):`) || machine.color;
+                machines[machineIndex] = {...machine, name, price, madeIn, year, color};
+                document.getElementById('outputArea').innerHTML = '<p class="text-green-500">Machine updated successfully!</p>';
+            } else {
+                document.getElementById('outputArea').innerHTML = '<p class="text-red-500">Machine not found</p>';
+            }
+        }
+
+        function deleteById() {
+            const id = parseInt(prompt('Enter the ID to delete:'));
+            const machineIndex = machines.findIndex(m => m.id === id);
+            if (machineIndex !== -1) {
+                const deletedMachine = machines.splice(machineIndex, 1)[0];
+                deletedMachines.push(deletedMachine);
+                document.getElementById('outputArea').innerHTML = '<p class="text-green-500">Machine has been deleted successfully!</p>';
+            } else {
+                document.getElementById('outputArea').innerHTML = '<p class="text-red-500">Machine not found</p>';
+            }
+        }
+
+        function restoreDeletedItems() {
+            let output = '<h2 class="text-xl font-bold mb-2">Deleted Machines</h2>';
+            output += '<table class="w-full"><tr><th>ID</th><th>Name</th><th>Price</th><th>Made in</th><th>Year</th><th>Color</th></tr>';
+            deletedMachines.forEach(machine => {
+                output += `<tr><td>${machine.id}</td><td>${machine.name}</td><td>${machine.price}</td><td>${machine.madeIn}</td><td>${machine.year}</td><td>${machine.color}</td></tr>`;
+            });
+            output += '</table>';
+            document.getElementById('outputArea').innerHTML = output;
+
+            const id = parseInt(prompt('Enter ID to restore:'));
+            const machineIndex = deletedMachines.findIndex(m => m.id === id);
+            if (machineIndex !== -1) {
+                const restoredMachine = deletedMachines.splice(machineIndex, 1)[0];
+                machines.push(restoredMachine);
+                machines.sort((a, b) => a.id - b.id);
+                document.getElementById('outputArea').innerHTML += '<p class="text-green-500">Machine restored successfully!</p>';
+            } else {
+                document.getElementById('outputArea').innerHTML += '<p class="text-red-500">Machine not found</p>';
+            }
+        }
+    </script>
+</body>
+</html>
